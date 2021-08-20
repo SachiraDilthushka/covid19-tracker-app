@@ -7,7 +7,7 @@ import Map from "./Map";
 import Table from "./Table";
 import sortData from "./util";
 import LineGraph from "./LineGraph";
-
+import "leaflet/dist/leaflet.css";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,7 +28,8 @@ function App() {
 	const [country, setCountry] = useState("Worldwide");
 	const [countryInfo, setCountryInfo] = useState({});
 	const [tableData, setTableData] = useState([]);
-
+	const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
+	const [mapZoom, setMapZoom] = useState(3);
 	useEffect(() => {
 		fetch("https://corona.lmao.ninja/v3/covid-19/all")
 			.then((response) => response.json())
@@ -70,7 +71,11 @@ function App() {
 			.then((data) => {
 				setCountry(countryCode);
 				setCountryInfo(data);
+				setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
 
+				setMapZoom(5);
+				console.log(mapCenter);
+				console.log(data.countryInfo.lat, data.countryInfo.long);
 			});
 	};
 	console.log("Country Info ", countryInfo)
@@ -105,13 +110,11 @@ function App() {
 					<InfoBox title="Deaths" cases={countryInfo.todayDeaths} total={countryInfo.deaths} />
 				</div>
 
-				<div>
-					
-					
-				</div>
-				<div>
-					<Map />
-				</div>
+				<Map
+					center={mapCenter}
+					zoom={mapZoom}
+				/>
+
 
 			</div>
 
