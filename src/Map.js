@@ -1,20 +1,26 @@
 import React from 'react';
 import './Map.css';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
-function Map({ center, zoom }) {
-	return (
+import {useMap , MapContainer as LeafletMap, TileLayer } from 'react-leaflet';
+import { showDataOnMap } from './util';
+function Map({ countries, casesType, center, zoom }) {
+
 	
-		<div className = "map">
-			Map
-			<MapContainer center={center} zoom={zoom} >
-			<TileLayer
-				attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-				url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-			/>
-		
-		</MapContainer>
+	return (
+
+		<div className="map">
+
+			<LeafletMap center={center} zoom={zoom} >
+				<TileLayer
+					attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+					url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+				/>
+				{showDataOnMap(countries, casesType)}
+
+
+
+			</LeafletMap>
 		</div>
-	)
+	);
 }
 
 export default Map

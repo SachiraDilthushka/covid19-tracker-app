@@ -1,35 +1,24 @@
 import { FormControl, Card, MenuItem, Select, InputLabel, CardContent } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
-import { makeStyles } from '@material-ui/core/styles';
 import './App.css';
 import InfoBox from "./InfoBox";
 import Map from "./Map";
 import Table from "./Table";
-import sortData from "./util";
+import {sortData} from "./util";
 import LineGraph from "./LineGraph";
 import "leaflet/dist/leaflet.css";
 
 
-const useStyles = makeStyles((theme) => ({
-	formControl: {
-		margin: theme.spacing(1),
-		minWidth: 120,
-	},
-	selectEmpty: {
-		marginTop: theme.spacing(2),
-	},
-}));
-
-
-
-function App() {
-	const classes = useStyles();
+const App = ()=>{
+	
 	const [countries, setCountries] = useState([]);
 	const [country, setCountry] = useState("Worldwide");
 	const [countryInfo, setCountryInfo] = useState({});
 	const [tableData, setTableData] = useState([]);
-	const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
+	const [mapCenter, setMapCenter] = useState({ lat: 51.505, lng:  -0.09 });
 	const [mapZoom, setMapZoom] = useState(3);
+	const [mapCountries, setMapCountries] =useState([]);
+	const [casesType, setCasesType] = useState("cases");
 	useEffect(() => {
 		fetch("https://corona.lmao.ninja/v3/covid-19/all")
 			.then((response) => response.json())
@@ -52,8 +41,9 @@ function App() {
 							value: country.countryInfo.iso2  // USA, UK
 						}
 					));
-					const sortedData = sortData(data);
+					let sortedData = sortData(data);
 					setTableData(sortedData);
+					setMapCountries(data);
 					setCountries(countries);
 				});
 		};
@@ -61,32 +51,53 @@ function App() {
 
 	}, []);
 
+
+
+	
+
 	const onCountryChange = async (event) => {
 		const countryCode = event.target.value;
 
-		setCountry(countryCode);
+		//setCountry(countryCode);
 		const url = countryCode === "Worldwide" ? "https://corona.lmao.ninja/v3/covid-19/all" : `https://corona.lmao.ninja/v3/covid-19/countries/${countryCode}`;
 		await fetch(url)
 			.then((response) => response.json())
 			.then((data) => {
-				setCountry(countryCode);
-				setCountryInfo(data);
 				setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+				setMapZoom(3);
+				
+				setCountry(countryCode);
 
-				setMapZoom(5);
-				console.log(mapCenter);
-				console.log(data.countryInfo.lat, data.countryInfo.long);
+				//-------/
+				setCountryInfo(data);
+				if(countryCode === 'worldwide') {
+					setMapCenter({lat: 35.012624, lng: 23.077046});
+					if (countryCode === 'worldwide'){
+					 setMapZoom(2.5);
+					}
+				  }
+				  else {
+					console.log('lat and long ' , data.countryInfo.lat, data.countryInfo.long);
+					setMapCenter({lat : data.countryInfo.lat, lng : data.countryInfo.long});
+					if (countryCode !== 'worldwide'){
+					 setMapZoom(5);
+					}
+				  }
+
+				  //-------///
+				
 			});
 	};
-	console.log("Country Info ", countryInfo)
+
+	console.log(mapCenter);
+	console.log(mapZoom);
 
 	return (
 		<div className="app">
-
 			<div className="app_left">
 				<div className="app_header">
 					<h1>Covid-19 tracker</h1>
-					<FormControl className={classes.formControl} variant="outlined">
+					<FormControl  variant="outlined">
 						<InputLabel id="demo-simple-select-outlined-label">Country</InputLabel>
 						<Select
 							labelId="demo-simple-select-outlined-label"
@@ -111,6 +122,8 @@ function App() {
 				</div>
 
 				<Map
+					countries={mapCountries}
+					casesType = {casesType}
 					center={mapCenter}
 					zoom={mapZoom}
 				/>
@@ -118,9 +131,7 @@ function App() {
 
 			</div>
 
-
 			<Card className="app_right">
-
 				<CardContent>
 					<h3>Live Cases by country</h3>
 
@@ -128,11 +139,6 @@ function App() {
 					<h3>Worldwide new cases</h3>
 					<LineGraph />
 				</CardContent>
-
-
-
-				{/*Graph*/}
-
 			</Card>
 
 
@@ -140,6 +146,6 @@ function App() {
 
 
 	);
-}
+};
 
 export default App;

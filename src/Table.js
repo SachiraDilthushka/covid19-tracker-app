@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import Avatar from '@material-ui/core/Avatar';
-import TablePagination from '@material-ui/core/TablePagination';
+
 
 
 const StyledTableCell = withStyles((theme) => ({
